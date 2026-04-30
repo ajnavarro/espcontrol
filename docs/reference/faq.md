@@ -86,10 +86,10 @@ Yes. In the [Setup](/features/setup) **Settings** tab, under **Backup**, you can
 
 EspControl currently supports four Guition touchscreen panels:
 
-- **JC8012P4A1** — 10.1-inch, 1280x800 landscape orientation (ESP32-P4)
-- **JC1060P470** — 7-inch, 1024x600, landscape orientation (ESP32-P4)
-- **JC4880P443** — 4.3-inch, 480x800, portrait orientation (ESP32-P4)
-- **4848S040** — 4-inch, 480x480, square (ESP32-S3)
+- **JC8012P4A1** — 10.1-inch, 1280x800 landscape orientation (Guition, ESP32-P4)
+- **JC1060P470** — 7-inch, 1024x600, landscape orientation (Guition, ESP32-P4)
+- **JC4880P443** — 4.3-inch, 480x800, portrait orientation (Guition, ESP32-P4)
+- **4848S040** — 4-inch, 480x480, square (Guition, ESP32-S3)
 
 All use the same firmware features, card configuration, and web UI. The grid layout automatically matches each panel's screen size and orientation.
 
