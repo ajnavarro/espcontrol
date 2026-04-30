@@ -1,0 +1,17 @@
+# =============================================================================
+# DEV CONFIG - Local development entry point (3.5" SC01 PLUS portrait panel)
+# Flash with: esphome run dev.yaml
+# =============================================================================
+
+substitutions:
+  name: "wt32-sc01-plus-dev"
+  friendly_name: "Espcontrol WT32-SC01 PLUS Dev"
+  espcontrol_component_url: "../.."
+  espcontrol_component_ref: "HEAD"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+packages:
+  espcontrol: !include packages.yaml

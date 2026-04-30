@@ -1,0 +1,208 @@
+# =============================================================================
+# DEVICE - Wireless-Tag WT32-SC01 PLUS hardware definition
+# =============================================================================
+# Pin assignments, peripherals, and platform config for the 3.5" portrait
+# panel. Includes the ESP32-S3 SoC (native WiFi), ST7796 display over an
+# octal SPI bus, FT6336U capacitive touchscreen, and backlight PWM.
+# =============================================================================
+
+substitutions:
+  espcontrol_component_url: "https://github.com/jtenniswood/espcontrol"
+  espcontrol_component_ref: "main"
+
+# ---------------------------------------------------------------------------
+# ESP32-S3 platform (16MB flash, 2MB quad PSRAM, ESP-IDF framework)
+# ---------------------------------------------------------------------------
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      COMPILER_OPTIMIZATION_SIZE: y
+      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
+      CONFIG_SPIRAM_RODATA: y
+      # Internal RAM is tight after the display buffers, WiFi stack, and the
+      # espcontrol web server's HTTP handlers all initialize. Push mbedTLS
+      # buffers into PSRAM and reduce static WiFi RX buffers to free internal
+      # RAM during setup. lwIP/WiFi heap stays in internal RAM — quad-mode
+      # PSRAM is too slow for DHCP/AP packet handling and association fails
+      # silently when these allocations land in PSRAM.
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM: "8"
+
+# ---------------------------------------------------------------------------
+# External component
+# ---------------------------------------------------------------------------
+external_components:
+  - source:
+      type: git
+      url: ${espcontrol_component_url}
+      ref: ${espcontrol_component_ref}
+      path: components
+    components: [espcontrol]
+    refresh: 0s
+
+espcontrol:
+
+# ---------------------------------------------------------------------------
+# ESPHome core (device name from substitutions)
+# ---------------------------------------------------------------------------
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  on_boot:
+    - priority: -100
+      then:
+        - script.execute: apply_screen_rotation
+
+# ---------------------------------------------------------------------------
+# PSRAM (quad-mode 2MB, used by LVGL frame buffers)
+# ---------------------------------------------------------------------------
+psram:
+  mode: quad
+  speed: 80MHz
+
+# ---------------------------------------------------------------------------
+# OTA updates (ESPHome native + HTTP-based)
+# ---------------------------------------------------------------------------
+ota:
+  - platform: esphome
+  - platform: http_request
+
+# ---------------------------------------------------------------------------
+# Shared infrastructure (API, logging, web server, restart button)
+# ---------------------------------------------------------------------------
+packages:
+  core_infra: !include ../../../common/device/core_infra.yaml
+
+# ---------------------------------------------------------------------------
+# Backlight (LEDC PWM output + monochromatic light entity)
+# ---------------------------------------------------------------------------
+output:
+  - platform: ledc
+    pin:
+      number: GPIO45
+      ignore_strapping_warning: true
+    id: gpio_backlight_pwm
+    frequency: 150Hz
+    min_power: 0.01
+    zero_means_zero: true
+
+light:
+  - platform: monochromatic
+    output: gpio_backlight_pwm
+    name: Display Backlight
+    icon: mdi:lightbulb-on
+    id: display_backlight
+    restore_mode: RESTORE_DEFAULT_ON
+    default_transition_length: 0s
+    gamma_correct: 1.0
+    on_turn_on:
+      then:
+        - if:
+            condition:
+              lambda: |-
+                return id(screen_schedule_asleep) ||
+                       (id(schedule_enabled).state && !panel_time_or_fallback(id(panel_time).now(), id(homeassistant_time).now()).is_valid());
+            then:
+              - script.execute: backlight_force_display_off
+            else:
+              - if:
+                  condition:
+                    lambda: 'return id(screensaver_display_off_active);'
+                  then:
+                    - script.execute: screensaver_wake
+
+# ---------------------------------------------------------------------------
+# I2C bus and touchscreen (FT6336U capacitive, wakes screensaver on touch)
+# ---------------------------------------------------------------------------
+i2c:
+  sda: GPIO6
+  scl: GPIO5
+  frequency: 400kHz
+
+touchscreen:
+  - platform: ft63x6
+    id: my_touchscreen
+    display: my_display
+    interrupt_pin: GPIO7
+    on_touch:
+      - script.execute: screensaver_wake
+
+# ---------------------------------------------------------------------------
+# Octal SPI bus for the ST7796 display
+# ---------------------------------------------------------------------------
+spi:
+  - type: octal
+    id: octal_spi
+    clk_pin: GPIO47
+    data_pins:
+      - GPIO9
+      - number: GPIO46
+        ignore_strapping_warning: true
+      - number: GPIO3
+        ignore_strapping_warning: true
+      - GPIO8
+      - GPIO18
+      - GPIO17
+      - GPIO16
+      - GPIO15
+
+# ---------------------------------------------------------------------------
+# Display (3.5" 320x480 ST7796 portrait panel)
+# ---------------------------------------------------------------------------
+display:
+  - platform: mipi_spi
+    id: my_display
+    model: wt32-sc01-plus
+    data_rate: 10MHz
+    update_interval: never
+    auto_clear_enabled: False
+
+# ---------------------------------------------------------------------------
+# LVGL base (display binding, must be before any page definitions)
+# ---------------------------------------------------------------------------
+lvgl:
+  id: main_lvgl
+  # Smaller draw buffer — internal RAM is tight on this 2MB-PSRAM board.
+  # 10% (~30 KB) is enough for incremental rendering and leaves room for
+  # the WiFi scan-results vector which periodically reserves internal RAM.
+  buffer_size: 10%
+  displays: my_display
+  touchscreens:
+    - touchscreen_id: my_touchscreen
+      long_press_time: 3s
+
+script:
+  - id: apply_screen_rotation
+    then:
+      - if:
+          condition:
+            lambda: 'return id(screen_rotation_select).current_option() == "180";'
+          then:
+            - lvgl.display.set_rotation: 180
+          else:
+            - lvgl.display.set_rotation: 0
+
+select:
+  - platform: template
+    name: "Screen: Rotation"
+    internal: true
+    disabled_by_default: true
+    id: screen_rotation_select
+    entity_category: config
+    icon: "mdi:screen-rotation"
+    optimistic: true
+    restore_value: true
+    initial_option: "0"
+    options:
+      - "0"
+      - "180"
+    on_value:
+      then:
+        - script.execute: apply_screen_rotation

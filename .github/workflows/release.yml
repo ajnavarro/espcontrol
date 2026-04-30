@@ -31,6 +31,9 @@ jobs:
           - device: guition-esp32-s3-4848s040
             slug: guition-esp32-s3-4848s040
             chip: ESP32-S3
+          - device: wt32-sc01-plus
+            slug: wt32-sc01-plus
+            chip: ESP32-S3
     steps:
       - uses: actions/checkout@v6
 
@@ -83,7 +86,7 @@ jobs:
                 "ota": {
                   "path": "${{ matrix.slug }}.ota.bin",
                   "md5": "${OTA_MD5}",
-                  "release_url": "https://github.com/jtenniswood/espcontrol/releases/tag/${VERSION}"
+                  "release_url": "https://github.com/ajnavarro/espcontrol/releases/tag/${VERSION}"
                 }
               }
             ]

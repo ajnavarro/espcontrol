@@ -4,9 +4,9 @@
 
 **A no-code, super-easy-to-configure smart home controller.** Configure affordable touchscreens to control devices across your entire smart home — no ESPHome setup, no YAML, no code to write. Just flash, connect, and start adding cards.
 
-Espcontrol is free, open-source firmware that turns **Guition ESP32** touchscreens into beautiful control panels for [Home Assistant](https://www.home-assistant.io/). It comes with **full documentation** and an **easy-to-use web installer** — you can go from unboxing to a working wall panel in minutes.
+Espcontrol is free, open-source firmware that turns **ESP32** touchscreens into beautiful control panels for [Home Assistant](https://www.home-assistant.io/). It comes with **full documentation** and an **easy-to-use web installer** — you can go from unboxing to a working wall panel in minutes.
 
-Supported panels include the **10.1-inch JC8012P4A1** (1280×800, landscape, 20 card slots), the **7-inch JC1060P470** (1024×600, landscape, 15 card slots), the **4.3-inch JC4880P443** (480×800, portrait, 6 card slots), and the **4-inch 4848S040** (480×480, square, 9 card slots). Each panel uses a fixed grid layout sized to its screen, plus a status bar with a clock and temperatures, a screensaver, automatic brightness, and **over-the-air updates**. After the first install, everything is configured through the device's **built-in web page**.
+Supported panels include the **10.1-inch JC8012P4A1** (1280×800, landscape, 20 card slots), the **7-inch JC1060P470** (1024×600, landscape, 15 card slots), the **4.3-inch JC4880P443** (480×800, portrait, 6 card slots), the **4-inch 4848S040** (480×480, square, 9 card slots), and the **3.5-inch WT32-SC01 PLUS** (320×480, portrait, 6 card slots). Each panel uses a fixed grid layout sized to its screen, plus a status bar with a clock and temperatures, a screensaver, automatic brightness, and **over-the-air updates**. After the first install, everything is configured through the device's **built-in web page**.
 
 **Documentation and install guide:** [jtenniswood.github.io/espcontrol](https://jtenniswood.github.io/espcontrol/)
 
@@ -23,13 +23,13 @@ Supported panels include the **10.1-inch JC8012P4A1** (1280×800, landscape, 20 
 
 ## Supported Screens
 
-| 10.1″ JC8012P4A1 | 7″ JC1060P470 | 4.3″ JC4880P443 | 4″ 4848S040 |
-|:-:|:-:|:-:|:-:|
-| Image pending | ![7-inch JC1060P470](docs/public/images/jc1060p470-hero.jpg) | ![4.3-inch JC4880P443](docs/public/images/jc4880p443-hero.jpg) | ![4-inch 4848S040](docs/public/images/4848s040-hero.jpg) |
-| 1280×800 landscape · 20 card slots | 1024×600 landscape · 15 card slots | 480×800 portrait · 6 card slots | 480×480 square · 9 card slots |
-| ESP32-P4 | ESP32-P4 | ESP32-P4 | ESP32-S3 |
-| Guition / AliExpress | [AliExpress ~£40](https://s.click.aliexpress.com/e/_c335W0r5) | [AliExpress ~£24](https://s.click.aliexpress.com/e/_c32jr3eN) | [AliExpress ~£16](https://s.click.aliexpress.com/e/_c3sIhvBv) |
-| | [Desk stand (3D print)](https://makerworld.com/en/models/2387421-guition-esp32p4-jc1060p470-7inch-screen-desk-mount#profileId-2614995) | | [Case stand (3D print)](https://makerworld.com/en/models/2581572-guition-esp32s3-4848s040-case-stand#profileId-2847301) |
+| 10.1″ JC8012P4A1 | 7″ JC1060P470 | 4.3″ JC4880P443 | 4″ 4848S040 | 3.5″ WT32-SC01 PLUS |
+|:-:|:-:|:-:|:-:|:-:|
+| Image pending | ![7-inch JC1060P470](docs/public/images/jc1060p470-hero.jpg) | ![4.3-inch JC4880P443](docs/public/images/jc4880p443-hero.jpg) | ![4-inch 4848S040](docs/public/images/4848s040-hero.jpg) | Image pending |
+| 1280×800 landscape · 20 card slots | 1024×600 landscape · 15 card slots | 480×800 portrait · 6 card slots | 480×480 square · 9 card slots | 320×480 portrait · 6 card slots |
+| ESP32-P4 | ESP32-P4 | ESP32-P4 | ESP32-S3 | ESP32-S3 |
+| Guition / AliExpress | [AliExpress ~£40](https://s.click.aliexpress.com/e/_c335W0r5) | [AliExpress ~£24](https://s.click.aliexpress.com/e/_c32jr3eN) | [AliExpress ~£16](https://s.click.aliexpress.com/e/_c3sIhvBv) | Wireless-Tag / AliExpress |
+| | [Desk stand (3D print)](https://makerworld.com/en/models/2387421-guition-esp32p4-jc1060p470-7inch-screen-desk-mount#profileId-2614995) | | [Case stand (3D print)](https://makerworld.com/en/models/2581572-guition-esp32s3-4848s040-case-stand#profileId-2847301) | |
 
 See the [docs](https://jtenniswood.github.io/espcontrol/) for full specs and install instructions for each screen.
 

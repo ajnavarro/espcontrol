@@ -116,6 +116,18 @@ const devices = [
     rows: 3,
     aspect: '1 / 1',
     shape: 'square'
+  },
+  {
+    slug: 'wt32-sc01-plus',
+    name: 'WT32-SC01 PLUS',
+    size: '3.5 in',
+    resolution: '320 x 480',
+    orientation: 'Portrait',
+    slots: 6,
+    cols: 2,
+    rows: 3,
+    aspect: '320 / 480',
+    shape: 'portrait'
   }
 ]
 
