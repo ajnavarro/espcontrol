@@ -74,15 +74,40 @@ jobs:
       - name: Set device slugs
         run: echo "DEVICE_SLUGS=$(jq -r 'keys | join(" ")' src/webserver/devices.json)" >> $GITHUB_ENV
 
-      - name: Download firmware from latest release
+      - name: Resolve latest release with assets
+        id: latest_release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
+          # `gh release download` defaults to "latest", but a release that was
+          # just created by Build Release may have zero assets while firmware
+          # is still compiling. Pick the newest non-prerelease release whose
+          # asset list is non-empty so all devices download from the same tag.
+          TAG=$(gh release list --limit 20 --json tagName,isPrerelease,isDraft \
+            -q '[.[] | select(.isPrerelease == false and .isDraft == false)] | .[].tagName' \
+            | while read -r CANDIDATE; do
+                COUNT=$(gh release view "$CANDIDATE" --json assets -q '.assets | length')
+                if [ "$COUNT" -gt 0 ]; then echo "$CANDIDATE"; break; fi
+              done)
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          if [ -z "$TAG" ]; then
+            echo "::warning::No published release with assets found yet"
+          else
+            echo "Using release: $TAG"
+          fi
+
+      - name: Download firmware from latest release
+        if: steps.latest_release.outputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.latest_release.outputs.tag }}
+        run: |
           for SLUG in $DEVICE_SLUGS; do
             (
               mkdir -p "firmware/${SLUG}"
-              gh release download \
+              gh release download "$RELEASE_TAG" \
                 --pattern "${SLUG}.manifest.json" \
                 --pattern "${SLUG}.factory.bin" \
                 --pattern "${SLUG}.ota.bin" \
