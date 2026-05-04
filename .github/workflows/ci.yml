@@ -91,6 +91,7 @@ jobs:
           - guition-esp32-p4-jc4880p443
           - guition-esp32-p4-jc8012p4a1
           - guition-esp32-s3-4848s040
+          - wt32-sc01-plus
     steps:
       - uses: actions/checkout@v6
 
